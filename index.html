@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Photo Title]-[Date Captured]</title>
+    <title> Image Search Results </title>
     <style>
         body {
             font-family: Geneva, sans-serif;
@@ -12,209 +12,108 @@
             padding: 0;
             background-color: #091831;
         }
-	.logo {
-	    max-width: 500px;
+        .logo {
+            max-width: 500px;
             margin: 50px auto;
             padding: 20px;
             background-color: #ECF2FD;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	}
+        }
         .container {
             max-width: 1200px;
             margin: 50px auto;
             padding: 20px;
             background-color: #ECF2FD;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         img {
-            max-width: 100%px;
+            max-width: 100%;
             height: auto;
             border-radius: 8px;
         }
-        h1 {
+        h1, h3, p {
             color: #333;
         }
-        p {
-            font-size: 1.1em;
-            color: #555;
-            margin-top: 10px;
+        .carousel-buttons {
+            margin-top: 20px;
+        }
+        .carousel-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1em;
+            color:#091831;
+            background-color: #ECF2FD;
+            cursor: pointer;
         }
     </style>
 </head>
-</head>
-<div class="logo">
-<a href='https://www.knoxhistory.org' target='_blank'><img src='https://www.knoxhistory.org/templates/rt_studius/custom/images/logo.png' border='0' alt='Knox History Logo'/></a>
 <body>
+
+<div class="logo">
+    <a href='https://www.knoxhistory.org' target='_blank'>
+        <img src='https://www.knoxhistory.org/templates/rt_studius/custom/images/logo.png' alt='Knox History Logo'>
+    </a>
 </div>
-<body class="bg-gray-100">
-    <header class="bg-blue-700 text-white py-4 shadow-md">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold">Historical Photo Database</h1>
-                <nav class="hidden md:block">
-                    <ul class="flex space-x-6">
-                        <li><a href="#collections" class="hover:text-blue-200 transition duration-300">Collections</a></li>
-                        <li><a href="#search" class="hover:text-blue-200 transition duration-300">Search</a></li>
-                        <li><a href="#about" class="hover:text-blue-200 transition duration-300">About Us</a></li>
-                        <li><a href="#contact" class="hover:text-blue-200 transition duration-300">Contact</a></li>
-                    </ul>
-                </nav>
-                <button id="hamburger-btn" class="md:hidden text-white focus:outline-none" aria-label="Toggle Navigation">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
-        </div>
-    </header>
 
-    <div id="mobile-menu" class="hidden fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-90 z-50">
-        <div class="bg-gray-800 w-80 h-full absolute right-0 p-6">
-            <div class="flex justify-end mb-4">
-                <button id="close-menu-btn" class="text-white focus:outline-none" aria-label="Close Menu">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <nav class="block">
-                <ul class="space-y-4">
-                    <li><a href="#collections" class="block text-lg text-white hover:text-blue-200 transition duration-300">Collections</a></li>
-                    <li><a href="#search" class="block text-lg text-white hover:text-blue-200 transition duration-300">Search</a></li>
-                    <li><a href="#about" class="block text-lg text-white hover:text-blue-200 transition duration-300">About Us</a></li>
-                    <li><a href="#contact" class="block text-lg text-white hover:text-blue-200 transition duration-300">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
+<div class="container">
+    <h1 id="photo-title">[Photo Title]</h1>
+    <h3 id="photo-date">[Date Captured]</h3>
+    <p id="photo-description">[Description]</p>
+    <img id="photo-image" src="[Link]" alt="[Image Title + ID]">
+
+    <div class="carousel-buttons">
+        <button onclick="prevImage()">Previous</button>
+        <button onclick="nextImage()">Next</button>
     </div>
+</div>
 
-    <main class="container mx-auto px-4 py-8">
-        <section id="hero" class="text-center mb-12">
-            <h2 class="text-3xl font-semibold text-gray-800 mb-4">Welcome to Our Historical Photo Archive</h2>
-            <p class="text-lg text-gray-600 mb-6">Explore a rich collection of historical photographs from our community.</p>
-            <a href="#collections" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300">Discover the Collections</a>
-        </section>
-
-        <section id="collections" class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Featured Collections</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-lg">
-                    <img src="https://placehold.co/400x300/EEE/31343C" alt="Collection 1" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Early Town Life</h3>
-                        <p class="text-gray-600">Explore photos of the town's early days, its people, and significant events.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-lg">
-                    <img src="https://placehold.co/400x300/EEE/31343C" alt="Collection 2" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Industrial Development</h3>
-                        <p class="text-gray-600">Discover images documenting the growth of local industries and factories.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-lg">
-                    <img src="https://placehold.co/400x300/EEE/31343C" alt="Collection 3" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2"> местная архитектура </h3>
-                        <p class="text-gray-600">View photographs of historical buildings, homes, and landmarks.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-8">
-                <a href="#" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-6 rounded-full transition duration-300">View All Collections</a>
-            </div>
-        </section>
-
-        <section id="search" class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Search the Archive</h2>
-            <div class="flex justify-center">
-                <div class="w-full md:w-2/3 flex flex-col sm:flex-row gap-3">
-                    <input type="text" placeholder="Enter keywords..." class="w-full rounded-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-3 px-6">
-                    <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 w-full sm:w-auto">
-                        <i class="fas fa-search mr-2"></i> Search
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">About Us</h2>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <p class="text-gray-700 text-lg">
-                    The Historical Society is dedicated to preserving and sharing the rich history of our community. We collect,
-                    maintain, and digitize historical photographs, documents, and artifacts to make them accessible to everyone.
-                    Our mission is to educate and inspire an appreciation for the past.
-                </p>
-            </div>
-        </section>
-
-        <section id="contact">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Contact Us</h2>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <p class="text-gray-700 text-lg text-center">
-                    Email: info@historicalphotos.com<br>
-                    Phone: (123) 456-7890<br>
-                    Address: 123 Main Street, Anytown, USA
-                </p>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-200 text-gray-700 py-4 mt-8">
-        <div class="container mx-auto px-4 text-center">
-            <p>© 2024 Historical Photo Database. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        const hamburgerBtn = document.getElementById("hamburger-btn");
-        const mobileMenu = document.getElementById("mobile-menu");
-        const closeMenuBtn = document.getElementById("close-menu-btn");
-        const mobileMenuLinks = mobileMenu.querySelectorAll("a");
-        const navLinks = document.querySelectorAll('.nav-links a');
-        const sections = document.querySelectorAll('section');
-
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle("hidden");
+<script>
+    const images = [
+        {
+            title: "Historic Downtown",
+            date: "1925",
+            description: "A view of downtown Knox in 1925.",
+            src: "link-to-first-image.jpg"
+        },
+        {
+            title: "Old Train Station",
+            date: "1940",
+            description: "Knox train station bustling with passengers.",
+            src: "link-to-second-image.jpg"
+        },
+        {
+            title: "Founders' Day Parade",
+            date: "1955",
+            description: "Colorful parade during Founders' Day celebrations.",
+            src: "link-to-third-image.jpg"
         }
+    ];
 
-        hamburgerBtn.addEventListener("click", toggleMobileMenu);
-        closeMenuBtn.addEventListener("click", toggleMobileMenu);
-        mobileMenuLinks.forEach(link => {
-            link.addEventListener("click", toggleMobileMenu);
-        });
+    let currentIndex = 0;
 
-        document.addEventListener('click', (event) => {
-            if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(event.target) && event.target !== hamburgerBtn) {
-                toggleMobileMenu();
-            }
-        });
+    function showImage(index) {
+        const image = images[index];
+        document.getElementById('photo-title').innerText = image.title;
+        document.getElementById('photo-date').innerText = image.date;
+        document.getElementById('photo-description').innerText = image.description;
+        document.getElementById('photo-image').src = image.src;
+        document.getElementById('photo-image').alt = image.title;
+    }
 
-        function updateActiveNavLink() {
-            let currentSectionId = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.scrollY >= sectionTop - 100 && window.scrollY < sectionTop + sectionHeight - 100) {
-                    currentSectionId = section.getAttribute('id');
-                }
-            });
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        showImage(currentIndex);
+    }
 
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').slice(1) === currentSectionId) {
-                    link.classList.add('active');
-                }
-            });
-        }
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        showImage(currentIndex);
+    }
 
-        window.addEventListener('scroll', updateActiveNavLink);
+    // Initialize the first image
+    showImage(currentIndex);
+</script>
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
 </body>
 </html>
