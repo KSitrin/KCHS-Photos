@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SQLite Browser with Add Record</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea, input, button { width: 100%; margin-top: 10px; padding: 8px; }
+    table, th, td { border: 1px solid #ddd; border-collapse: collapse; padding: 8px; }
+    th { background-color: #f4f4f4; }
+    #output { margin-top: 20px; }
+    .form-section { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+<h1>SQLite Browser + Add Photo</h1>
+
+<button onclick="createAndQueryDB()">Create Sample DB</button>
+
+<h2>Run SQL Query</h2>
+<textarea id="query" placeholder="Write your SQL query here...">SELECT * FROM photos;</textarea>
+
+<button onclick="executeQuery()">Run Query</button>
+
+<h2>Results:</h2>
+<div id="output"></div>
+
+<div class="form-section">
+    <h2>Add New Photo</h2>
+
+    <input type="text" id="dateCapturedYear" placeholder="Year Captured (YYYY)" size="20"/>
+    <input type="text" id="dateCapturedMonth" placeholder="Month Captured (MM)" />
+    <input type="text" id="dateCapturedDay" placeholder="Day Captured (DD)" />
+    <input type="text" id="title" placeholder="Title" />
+    <input type="text" id="description" placeholder="Description" />
+    <input type="text" id="dateAddedYear" placeholder="Year Added (YYYY)" />
+    <input type="text" id="dateAddedMonth" placeholder="Month Added (MM)" />
+    <input type="text" id="dateAddedDay" placeholder="Day Added (DD)" />
+
+  <button onclick="addRecord()">Add Photo</button>
+</div>
+
+<script>
+let db; // Global database instance
+
+async function init() {
+    window.SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+    });
+}
+
+async function createAndQueryDB() {
+    if (!window.SQL) {
+        await init();
+    }
+
+    db = new SQL.Database();
+
+    db.run(`
+        CREATE TABLE photos (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Date_Captured_Year INT(4),
+            Date_Captured_Month INT(2),
+            Date_Captured_Day INT(2),
+            Title TEXT,
+            Description TEXT,
+            Date_Added_Year INT(4),
+            Date_Added_Month INT(2),
+            Date_Added_Day INT(2)
+        );
+
+        INSERT INTO photos (Date_Captured, Title, Description, Date_Added) VALUES
+        ('2023-10-01', 'Sunset at the Beach', 'A beautiful sunset over the ocean.', '2023-10-02'),
+        ('2023-09-15', 'Mountain Hike', 'Reached the peak during an amazing hike.', '2023-09-16'),
+        ('2023-08-20', 'City Lights', 'Night view of the city skyline.', '2023-08-21');
+    `);
+
+    alert('Sample database created! You can now query and add records.');
+}
+
+function executeQuery() {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+
+    if (!db) {
+        outputDiv.innerHTML = '<p style="color: red;">No database loaded or created.</p>';
+        return;
+    }
+
+    const query = document.getElementById('query').value;
+    let results;
+    try {
+        results = db.exec(query);
+    } catch (e) {
+        outputDiv.innerHTML = `<p style="color: red;">Error: ${e.message}</p>`;
+        return;
+    }
+
+    if (results.length === 0) {
+        outputDiv.innerHTML = '<p>No results.</p>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+
+    results[0].columns.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    results[0].values.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell;
+            tr.appendChild(td);
+        });
+        table.appendChild(tr);
+    });
+
+    outputDiv.appendChild(table);
+}
+
+function addRecord() {
+    if (!db) {
+        alert('No database loaded or created yet!');
+        return;
+    }
+
+    const dateCaptured = document.getElementById('dateCaptured').value.trim();
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const dateAdded = document.getElementById('dateAdded').value.trim();
+
+    if (!dateCaptured || !title || !description || !dateAdded) {
+        alert('Please fill in all fields!');
+        return;
+    }
+
+    try {
+        db.run(`
+            INSERT INTO photos (Date_Captured, Title, Description, Date_Added)
+            VALUES (?, ?, ?, ?);
+        `, [dateCaptured, title, description, dateAdded]);
+
+        alert('Photo added successfully!');
+        document.getElementById('query').value = 'SELECT * FROM photos;';
+        executeQuery();
+    } catch (e) {
+        alert('Error inserting record: ' + e.message);
+    }
+}
+
+init();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQLite in Browser with SQL.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+</head>
+<body>
+    <h1>SQLite Example in Browser</h1>
+    <button onclick="initDb()">Create and Query DB</button>
+
+    <h2>Results:</h2>
+    <ul id="results"></ul>
+
+    <script>
+        async function initDb() {
+            // Load and initialize SQL.js
+            const SQL = await initSqlJs({
+                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+            });
+
+            // Create a new database
+            const db = new SQL.Database();
+
+            // Create a table
+            db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);");
+
+            // Insert some data
+            const stmt = db.prepare("INSERT INTO users (name) VALUES (?);");
+            stmt.run(["Alice"]);
+            stmt.run(["Bob"]);
+            stmt.run(["Charlie"]);
+            stmt.free(); // Always free your statement!
+
+            // Query the database
+            const result = db.exec("SELECT id, name FROM users;");
+
+            // Display results
+            const ul = document.getElementById('results');
+            ul.innerHTML = ''; // Clear previous
+            if (result.length > 0) {
+                const values = result[0].values; // Get rows
+                values.forEach(row => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${row[0]}, Name: ${row[1]}`;
+                    ul.appendChild(li);
+                });
+            }
+
+            // Optional: export the database to a file
+            // const binaryArray = db.export();
+            // const blob = new Blob([binaryArray]);
+            // downloadBlob(blob, 'mydatabase.sqlite');
+        }
+    </script>
+</body>
+</html>

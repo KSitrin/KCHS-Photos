@@ -1,0 +1,48 @@
+let db;
+let images = [];
+let currentIndex = 0;
+
+async function init() {
+    window.SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+    });
+    db = new SQL.Database();
+
+    db.run(`
+        CREATE TABLE photos (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Date_Captured TEXT,
+            Title TEXT,
+            Description TEXT,
+            Date_Added TEXT,
+            Image_Link TEXT
+        );
+
+        INSERT INTO photos (Date_Captured, Title, Description, Date_Added, Image_Link) VALUES
+        ('1925', 'Historic Downtown', 'A view of downtown Knox in 1925.', '2023-10-02', 'link-to-first-image.jpg'),
+        ('1940', 'Old Train Station', 'Knox train station bustling with passengers.', '2023-09-16', 'link-to-second-image.jpg'),
+        ('1955', 'Founders\' Day Parade', 'Colorful parade during Founders\' Day celebrations.', '2023-08-21', 'link-to-third-image.jpg');
+    `);
+
+    loadImagesFromDB();
+}
+
+function loadImagesFromDB() {
+    const res = db.exec("SELECT Title, Date_Captured, Description, Image_Link FROM photos;");
+    if (res.length > 0) {
+        const cols = res[0].columns;
+        const values = res[0].values;
+
+        images = values.map(row => {
+            return {
+                title: row[cols.indexOf("Title")],
+                date: row[cols.indexOf("Date_Captured")],
+                description: row[cols.indexOf("Description")],
+                src: row[cols.indexOf("Image_Link")]
+            };
+        });
+
+        showImage(currentIndex);
+    }
+}
+init();

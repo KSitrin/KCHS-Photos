@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SQLite Browser (in your Browser!)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 100px; margin-top: 10px; }
+    table, th, td { border: 1px solid #ddd; border-collapse: collapse; padding: 8px; }
+    th { background-color: #f4f4f4; }
+    #output { margin-top: 20px; }
+    button { margin-top: 10px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+
+<h1>SQLite Browser in Browser</h1>
+
+<input type="file" id="fileInput" accept=".sqlite, .db"/>
+<br/>
+
+<textarea id="query" placeholder="Write your SQL query here...">SELECT name FROM sqlite_master WHERE type='table';</textarea>
+<br/>
+
+<button onclick="executeQuery()">Run Query</button>
+
+<h2>Results:</h2>
+<div id="output"></div>
+
+<script>
+let db; // Global database instance
+
+async function init() {
+    window.SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+    });
+
+    document.getElementById('fileInput').addEventListener('change', async function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const buffer = await file.arrayBuffer();
+            db = new SQL.Database(new Uint8Array(buffer));
+            alert('Database loaded successfully!');
+        }
+    });
+}
+
+function executeQuery() {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+
+    if (!db) {
+        outputDiv.innerHTML = '<p style="color: red;">No database loaded.</p>';
+        return;
+    }
+
+    const query = document.getElementById('query').value;
+    let results;
+    try {
+        results = db.exec(query);
+    } catch (e) {
+        outputDiv.innerHTML = `<p style="color: red;">Error: ${e.message}</p>`;
+        return;
+    }
+
+    if (results.length === 0) {
+        outputDiv.innerHTML = '<p>No results.</p>';
+        return;
+    }
+
+    // Render results in a table
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+
+    results[0].columns.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    results[0].values.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell;
+            tr.appendChild(td);
+        });
+        table.appendChild(tr);
+    });
+
+    outputDiv.appendChild(table);
+}
+
+init();
+</script>
+
+</body>
+</html>
