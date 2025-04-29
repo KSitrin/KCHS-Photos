@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search Results</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+    <style>
+        body {
+            font-family: Geneva, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #091831;
+        }
+        .logo {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ECF2FD;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ECF2FD;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        h1, h3, p {
+            color: #333;
+        }
+        .carousel-buttons, .upload-section, .search-section {
+            margin-top: 20px;
+        }
+        .carousel-buttons button, .upload-section button, .search-section button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1em;
+            color: #091831;
+            background-color: #ECF2FD;
+            cursor: pointer;
+        }
+        .upload-section input, .search-section input {
+            margin: 5px;
+            padding: 8px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+let db;
+let images = [];
+let currentIndex = 0;
+
+async function init() {
+    window.SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+    });
+    db = new SQL.Database();
+
+    db.run(`
+        CREATE TABLE photos (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Date_Captured TEXT,
+            Title TEXT,
+            Description TEXT,
+            Date_Added TEXT,
+            Image_Link TEXT
+        );
+
+        INSERT INTO photos (Date_Captured, Title, Description, Date_Added, Image_Link) VALUES
+        ('1925', 'Historic Downtown', 'A view of downtown Knox in 1925.', '2023-10-02', 'link-to-first-image.jpg'),
+        ('1940', 'Old Train Station', 'Knox train station bustling with passengers.', '2023-09-16', 'link-to-second-image.jpg'),
+        ('1955', 'Founders\' Day Parade', 'Colorful parade during Founders\' Day celebrations.', '2023-08-21', 'link-to-third-image.jpg');
+    `);
+}
+
+function searchImages() {
+    const searchField = document.getElementById('search-field').value.trim();
+    if (!searchField) {
+        alert('Please enter a search term!');
+        return;
+    }
+
+    const res = db.exec(`SELECT Title, Date_Captured, Description, Image_Link FROM photos WHERE Title LIKE '%${searchField}%' OR Description LIKE '%${searchField}%' OR Date_Captured LIKE '%${searchField}%';`);
+    if (res.length > 0) {
+        const cols = res[0].columns;
+        const values = res[0].values;
+
+        images = values.map(row => {
+            return {
+                title: row[cols.indexOf("Title")],
+                date: row[cols.indexOf("Date_Captured")],
+                description: row[cols.indexOf("Description")],
+                src: row[cols.indexOf("Image_Link")]
+            };
+        });
+
+        currentIndex = 0;
+        showImage(currentIndex);
+        document.querySelector('.carousel-buttons').style.display = 'block';
+    } else {
+        alert('No matching images found.');
+    }
+}
+
+function showAllImages() {
+    const res = db.exec("SELECT Title, Date_Captured, Description, Image_Link FROM photos;");
+    if (res.length > 0) {
+        const cols = res[0].columns;
+        const values = res[0].values;
+
+        images = values.map(row => {
+            return {
+                title: row[cols.indexOf("Title")],
+                date: row[cols.indexOf("Date_Captured")],
+                description: row[cols.indexOf("Description")],
+                src: row[cols.indexOf("Image_Link")]
+            };
+        });
+
+        currentIndex = 0;
+        showImage(currentIndex);
+        document.querySelector('.carousel-buttons').style.display = 'block';
+    }
+}
+
+function showImage(index) {
+    if (images.length === 0) return;
+    const image = images[index];
+    document.getElementById('photo-title').innerText = image.title;
+    document.getElementById('photo-date').innerText = image.date;
+    document.getElementById('photo-description').innerText = image.description;
+    document.getElementById('photo-image').src = image.src;
+    document.getElementById('photo-image').alt = image.title;
+}
+
+function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    showImage(currentIndex);
+}
+
+function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    showImage(currentIndex);
+}
+
+function addNewImage() {
+    const title = document.getElementById('new-title').value.trim();
+    const date = document.getElementById('new-date').value.trim();
+    const description = document.getElementById('new-description').value.trim();
+    const link = document.getElementById('new-link').value.trim();
+    const dateAdded = new Date().toISOString().split('T')[0];
+
+    if (!title || !date || !description || !link) {
+        alert('Please fill in all fields!');
+        return;
+    }
+
+    db.run(`INSERT INTO photos (Date_Captured, Title, Description, Date_Added, Image_Link) VALUES (?, ?, ?, ?, ?);`,
+        [date, title, description, dateAdded, link]
+    );
+
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-date').value = '';
+    document.getElementById('new-description').value = '';
+    document.getElementById('new-link').value = '';
+
+    alert('Photo added! Perform a new search or show all to see it.');
+}
+
+init();
+</script>
+
+<div class="logo">
+    <a href='https://www.knoxhistory.org' target='_blank'>
+        <img src='https://www.knoxhistory.org/templates/rt_studius/custom/images/logo.png' alt='Knox History Logo'>
+    </a>
+</div>
+
+<div class="container">
+    <div class="search-section">
+        <h2>Search Photos</h2>
+        <input type="text" id="search-field" placeholder="Enter title, description, or year">
+        <button onclick="searchImages()">Search</button>
+        <button onclick="showAllImages()">Show All</button>
+    </div>
+
+    <h1 id="photo-title">[Photo Title]</h1>
+    <h3 id="photo-date">[Date Captured]</h3>
+    <p id="photo-description">[Description]</p>
+    <img id="photo-image" src="" alt="[Image Title]">
+
+    <div class="carousel-buttons" style="display: none;">
+        <button onclick="prevImage()">Previous</button>
+        <button onclick="nextImage()">Next</button>
+    </div>
+
+    <div class="upload-section">
+        <h2>Add New Photo</h2>
+        <input type="text" id="new-title" placeholder="Title">
+        <input type="text" id="new-date" placeholder="Date Captured (e.g., 1950)">
+        <input type="text" id="new-description" placeholder="Description">
+        <input type="text" id="new-link" placeholder="Image Link URL">
+        <button onclick="addNewImage()">Add Photo</button>
+    </div>
+</div>
+
+</body>
+</html>
