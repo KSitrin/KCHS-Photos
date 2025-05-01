@@ -13,14 +13,14 @@
             background-color: #091831;
         }
         .logo {
-            max-width: 500px;
+            max-width: 800px;
             margin: 50px auto;
             padding: 20px;
             background-color: #ECF2FD;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 50px auto;
             padding: 20px;
             background-color: #ECF2FD;
@@ -28,7 +28,7 @@
             position: relative;
         }
         img {
-            max-width: 100%;
+            max-width: 900px;
             height: auto;
             border-radius: 8px;
         }
@@ -55,12 +55,14 @@
         <img src='https://www.knoxhistory.org/templates/rt_studius/custom/images/logo.png' alt='Knox History Logo'>
     </a>
 </div>
-
+<div style="margin: 20px auto; max-width: 500px;">
+    <input id="search-bar" type="text" placeholder="Search for images" style="width: 100%; padding: 10px; font-size: 1em; border-radius: 5px; border: 1px solid #ccc;">
+</div>
 <div class="container">
     <h1 id="photo-title">[Photo Title]</h1>
     <h3 id="photo-date">[Date Captured]</h3>
     <p id="photo-description">[Description]</p>
-    <img id="photo-image" src="[Link]" alt="[Image Title + ID]">
+    <img id="photo-image" src="[Link]" alt="[Image Title + ID]" width="900px">
 
     <div class="carousel-buttons">
         <button onclick="prevImage()">Previous</button>
@@ -102,17 +104,52 @@
     }
 
     function prevImage() {
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        showImage(currentIndex);
-    }
+        const list = window.filteredImages?.length ? window.filteredImages : images;
+        currentIndex = (currentIndex - 1 + list.length) % list.length;
+        showImageFromList(list, currentIndex);
+}
 
     function nextImage() {
-        currentIndex = (currentIndex + 1) % images.length;
-        showImage(currentIndex);
-    }
+        const list = window.filteredImages?.length ? window.filteredImages : images;
+        currentIndex = (currentIndex + 1) % list.length;
+        showImageFromList(list, currentIndex);
+}
+
+
 
     // Initialize the first image
     showImage(currentIndex);
+    document.getElementById('search-bar').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    const filteredImages = images.filter(img =>
+        img.title.toLowerCase().includes(query) ||
+        img.description.toLowerCase().includes(query)
+    );
+
+    currentIndex = 0;
+
+    if (filteredImages.length > 0) {
+        showImageFromList(filteredImages, currentIndex);
+    } else {
+        document.getElementById('photo-title').innerText = "No results found.";
+        document.getElementById('photo-date').innerText = "";
+        document.getElementById('photo-description').innerText = "";
+        document.getElementById('photo-image').src = "";
+        document.getElementById('photo-image').alt = "";
+    }
+
+    // Override navigation to only work on filtered list
+    window.filteredImages = filteredImages;
+});
+
+function showImageFromList(list, index) {
+    const image = list[index];
+    document.getElementById('photo-title').innerText = image.title;
+    document.getElementById('photo-date').innerText = image.date;
+    document.getElementById('photo-description').innerText = image.description;
+    document.getElementById('photo-image').src = image.src;
+    document.getElementById('photo-image').alt = image.title;
+}
 </script>
 
 </body>
