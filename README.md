@@ -1,0 +1,2 @@
+
+This is a website for displaying the images and related information from the Knox County Historical Society photo database. This page will be publicly accessible for anyone who wants to access the historical images. However, this page is not fully functional yet, as we would need to host the database on a public-facing website, which would ideally be on the KCHS website, https://www.knoxhistory.org/. Until then, we have pulled some images, titles, and brief descriptions on an image carousel to show how it might look, minus the search from the database itself. 
